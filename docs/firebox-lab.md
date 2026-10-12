@@ -63,8 +63,47 @@ DH-19 and DH-20. For Phase 2, I checked PFS and DH-20 with ESP-AES256-GCM.
 I also installed the client profile using the bat file to my PC.
 
 ## 5. HTTPS Proxy and Content Inspection
+I set the HTTPS proxy to Default-HTTPS-Client and to inspect traffic instead of 
+allowing it. So now the FB decrypts the TLS connection and inspects it.
+
+I tested this by checking website certificates and seeing `Fireware HTTPS Proxy` 
+instead of the site's normal public CA. I also tested this from WSL with:
+
+`openssl s_client -connect example.com:443 -servername example.com`
+
+This showed that `example.com` was being re-signed by the Fireware HTTPS Proxy CA.
+
+Some sites like Google, Microsoft, LinkedIn, and others were still showing their 
+normal public certificates. This was because of the predefined 
+`Content Inspection Exclusions`.
+
+It also seems that QUIC (UDP 443) doesn't go through the HTTPS proxy since it 
+handles TCP 443. I made a custom UDP 443 deny outgoing policy to test this and force 
+browsers back to TCP so the HTTPS proxy can inspect the connection. That policy also 
+needs to include `SSLVPN-Users` and `IKEv2-Users`.
 
 ## 6. Certificates
+
+To remove warnings in browsers, I installed two different certificats during the lab.
+
+### Firebox Web Server Certificate
+
+I created a custom Web Server certificate to remove browser warning when connecting 
+to the Firebox on `10.0.1.1:8080` from `Setup - Certificates - Firebox Web Server Certificate`.
+
+I made one called `Lab` and added the FB IPs I use to connect to it. I exported 
+`Lab.pem` from the FB and installed it in my PC's `Trusted Root Certification Authorities` 
+store. This is not to CA used for content inspection.
+
+### Fireware Https Proxy CA
+HTTPS inspection uses a different certificate called `Fireware HTTPS Proxy` CA.
+
+Without it, inspected websites show warnings because the FB decrypts and re-signs 
+the traffic with certificates that the clients don't trust. 
+
+It can be downloaded from the Certification Portal:  
+`10.0.1.1:4126/certportal`. It should then be installed in Windows' 
+`Trusted Root Certification Authorities`.
 
 ## 7. Fireware CLI
 
