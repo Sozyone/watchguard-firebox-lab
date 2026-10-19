@@ -107,4 +107,19 @@ It can be downloaded from the Certification Portal:
 
 ## 7. Fireware CLI
 
-## 8. Troubleshooting
+## 8. Troubleshooting and Tests
+
+### External port scan test
+
+I tested the FB externally using Nmap to see what would happen.
+
+I scanned the public IP for 500 top ports and also: TCP 4100, 4105, 4117, 4118, 4126, 8080.
+
+The FB's Default Threat Protection / Default Packet Handling detected the scan
+as a port scan attack and temporarily blocked my host's public IP. It could then
+be seen in `Blocked Sites`.
+
+After that, Nmap started showing the ports as `filtered` / `no-response`
+because the FB was silently dropping traffic.
+
+I could see that TCP 443 was open because of the needed SSL VPN policy.
