@@ -9,6 +9,7 @@ topology:
         - ip addr add 10.10.10.10/24 dev eth1
         - ip route add 10.20.20.0/24 via 10.10.10.1
         - ip route add 10.0.1.0/24 via 10.10.10.1
+        - ip route add 10.255.0.0/30 via 10.10.10.1
       
     r1:
       kind: linux
@@ -27,6 +28,7 @@ topology:
         - ip addr add 10.20.20.10/24 dev eth1
         - ip route add 10.10.10.0/24 via 10.20.20.1
         - ip route add 10.0.1.0/24 via 10.20.20.1
+        - ip route add 10.255.0.0/30 via 10.20.20.1
 
   links:
     - endpoints: ["client1:eth1", "r1:eth1"]
