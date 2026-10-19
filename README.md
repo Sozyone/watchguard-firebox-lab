@@ -10,6 +10,7 @@ More details are in `docs/firebox-lab.md`.
 
 ```text
 client1 10.10.10.10/24
+server1 10.20.20.10/24
         |
 r1
 ├── 10.10.10.1/24
@@ -21,8 +22,6 @@ WSL 10.255.0.1/30
 WSL eth2 10.0.1.2/24
         |
 WatchGuard T25 10.0.1.1/24
-
-server1 10.20.20.10/24
 ```
 
 ## Start
