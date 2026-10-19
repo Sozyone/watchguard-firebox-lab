@@ -44,13 +44,7 @@ sudo docker exec -it clab-firebox-lab-server1 bash
 
 Use `exit` to leave a node.
 
-## Destroy
-
-```bash
-sudo clab destroy -t containerlab/firebox-lab.clab.yml
-```
-
-## Rebuild
+##  Destroy and Rebuild
 
 ```bash
 sudo clab destroy -t containerlab/firebox-lab.clab.yml
