@@ -341,34 +341,10 @@ This showed that application-layer proxies can block traffic even when basic TCP
 
 ## 12. WSL and Containerlab Experiment
 
-I originally attempted to use WSL and Containerlab to create virtual clients and servers directly attached to the physical Firebox VLANs.
+Tried using WSL and Containerlab to make virtual clients and servers on the Firebox VLANs.
 
-The original idea was:
+Untagged traffic worked, but tagged 802.1Q VLAN traffic did not pass through WSL/Hyper-V to the Firebox trunk.
 
-```text
-Containerlab client -> VLAN 10 -> Firebox
-Containerlab server -> VLAN 20 -> Firebox
-```
+So I removed the Containerlab setup.
 
-WSL was connected through a Hyper-V external switch to the physical Ethernet adapter connected to the Firebox.
-
-Untagged Ethernet connectivity worked correctly.
-
-For example:
-
-```text
-WSL 10.0.2.2
-Firebox TRANSIT 10.0.2.1
-```
-
-This allowed normal routed communication.
-
-However, VLAN subinterfaces created inside WSL did not pass tagged 802.1Q traffic through the WSL / Hyper-V networking path to the physical Firebox trunk.
-
-Because of this, direct Containerlab attachment to the Firebox VLANs was abandoned.
-
-The Containerlab topology and WSL host setup scripts were removed from the repository.
-
-For future virtual clients and servers directly attached to the Firebox trunk, a small Linux Hyper-V VM with a trunked virtual NIC would be a cleaner design.
-
-Containerlab could then run inside that VM and create separate Linux hosts on the real Firebox VLANs.
+A Linux Hyper-V VM with a trunked NIC would work better for this.
