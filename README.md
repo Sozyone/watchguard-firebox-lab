@@ -39,10 +39,6 @@ Management VLAN:
 ```text
 10.30.30.0/24
 Firebox: 10.30.30.1
-
-
-
-
 ```
 
 Recovery/admin network:
