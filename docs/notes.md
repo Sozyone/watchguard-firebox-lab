@@ -1,12 +1,10 @@
 # WatchGuard Firebox Lab Notes
 
-These are configuration notes and observations from working with a physical WatchGuard Firebox T25.
-
-Network architecture, VLANs and reusable test commands are documented separately in `lab.md`.
+Notes and observations from working with a WatchGuard Firebox T25.
 
 ## 1. Initial Firebox Setup
 
-I started by factory resetting the WatchGuard T25.
+Started by factory resetting the WatchGuard T25.
 
 Initial connection:
 
@@ -15,7 +13,7 @@ Firebox eth1: 10.0.1.1
 Web UI: https://10.0.1.1:8080
 ```
 
-I completed the setup wizard and configured the Firebox as locally managed.
+Did the setup wizard with the Firebox as locally managed.
 
 Initial interfaces:
 
@@ -24,21 +22,19 @@ eth0 - External - DHCP
 eth1 - Trusted  - 10.0.1.1/24
 ```
 
-I upgraded Fireware to the latest available version and then moved most configuration work from the Web UI to WatchGuard System Manager and Policy Manager.
+Upgraded Fireware and then moved config work to WatchGuard System Manager and Policy Manager.
 
 ## 2. WatchGuard System Manager and Policy Manager
 
-I connected to the Firebox with WSM and used Policy Manager for most configuration.
-
-I created both SSL VPN and IKEv2 Mobile VPN configurations from:
+Created both SSL VPN and IKEv2 Mobile VPN from:
 
 ```text
 VPN -> Mobile VPN -> Get Started
 ```
 
-I disabled the broad default VPN allow policies.
+Disabled the broad default VPN allow policies.
 
-Instead, I added the VPN user groups only to policies they actually need.
+Instead, added the VPN user groups only to policies they need for more control.
 
 Examples:
 
@@ -49,22 +45,20 @@ DNS
 Ping
 ```
 
-During testing I also allowed the VPN groups to access Firebox management services.
+Also allowed the VPN groups to access Firebox management services.
 
-The VPN groups are VPN authentication groups, not normal Firewall groups:
+VPN groups:
 
 ```text
 SSLVPN-Users
 IKEv2-Users
 ```
 
-This provides more control than allowing VPN users broadly into the internal network.
-
 ## 3. Mobile VPN with SSL
 
 Authentication uses Firebox-DB.
 
-I created a test user and added the user to:
+Created a test user and added it to:
 
 ```text
 SSLVPN-Users
@@ -76,7 +70,7 @@ VPN address pool:
 192.168.132.0/24
 ```
 
-I intentionally used a less common private subnet to reduce the chance of overlapping with a user's home network.
+Used a less common private subnet to reduce the chance of overlapping with a user's home network.
 
 The SSL VPN uses:
 
@@ -85,21 +79,21 @@ TCP 443 - authentication/control connection
 UDP 443 - data channel
 ```
 
-Using UDP for the data channel avoids TCP-over-TCP behavior and generally performs better.
+Using UDP for the data channel avoids TCP-over-TCP and performs better.
 
 If UDP 443 is unavailable, the client can fall back to TCP.
 
 Encryption was configured with AES-GCM 256-bit.
 
-I installed the WatchGuard Mobile VPN with SSL client on Windows and tested connectivity.
+Installed the WatchGuard Mobile VPN with SSL client on Windows and tested connectivity.
 
-The VPN client should be kept updated, especially when WatchGuard publishes security fixes.
+The VPN client should be kept updated, especially when WatchGuard PSIRT says so (CVE).
 
 ## 4. Mobile VPN with IKEv2
 
-I also configured Mobile VPN with IKEv2.
+Also made a Mobile VPN with IKEv2.
 
-Authentication and policy access follow the same general principle as SSL VPN: users only receive access through policies that explicitly include the IKEv2 group.
+Authentication and policy access follow the same general principle as SSL VPN.
 
 Address pool:
 
@@ -115,9 +109,7 @@ IKEv2 normally begins on:
 UDP 500
 ```
 
-During `IKE_SA_INIT`, NAT detection takes place.
-
-If NAT is detected, communication moves to:
+During `IKE_SA_INIT`, NAT detection takes place. If NAT is detected, communication moves to:
 
 ```text
 UDP 4500
@@ -127,7 +119,7 @@ This is IPsec NAT Traversal, or NAT-T.
 
 Phase 1 configuration used AES-GCM 256-bit and modern Diffie-Hellman groups.
 
-Configured key groups included:
+Key groups:
 
 ```text
 DH-19
@@ -141,19 +133,19 @@ ESP-AES256-GCM
 DH-20
 ```
 
-I installed the generated IKEv2 client profile on Windows using the WatchGuard-generated `.bat` installer.
+Installed the generated IKEv2 client profile on Windows using the WatchGuard-generated `.bat` installer.
 
 ## 5. HTTPS Proxy and Content Inspection
 
-I configured the HTTPS proxy to use:
+Configured the HTTPS proxy to use:
 
 ```text
 Default-HTTPS-Client
 ```
 
-Instead of simply allowing HTTPS traffic, the proxy performs content inspection.
+I tested content inspection.
 
-This means the Firebox:
+So the Firebox does:
 
 ```text
 Client -> encrypted TLS -> Firebox
@@ -161,7 +153,7 @@ Firebox -> decrypted inspection
 Firebox -> new encrypted TLS -> Internet server
 ```
 
-I verified inspection by checking certificates presented to the client.
+Verified inspection by checking certificates.
 
 For inspected sites, the certificate issuer became:
 
@@ -191,11 +183,7 @@ LinkedIn
 
 HTTPS proxy inspection primarily applies to HTTPS over TCP.
 
-Modern browsers can use QUIC / HTTP3 over:
-
-```text
-UDP 443
-```
+Modern browsers can use QUIC / HTTP3 over `UDP 443`
 
 That traffic does not pass through the normal HTTPS TCP proxy in the same way.
 
@@ -205,7 +193,7 @@ This forced browsers to fall back to HTTPS over TCP, allowing the HTTPS proxy to
 
 The policy also needed to include VPN user groups when I wanted the same behavior for VPN clients.
 
-This was a lab experiment to understand protocol behavior, not automatically a recommendation for every production network.
+This was a lab experiment to understand protocol behavior, not automatically a recommendation for production network.
 
 ## 7. Certificates
 
@@ -221,37 +209,23 @@ For example:
 https://10.0.1.1:8080
 ```
 
-I created a custom Web Server certificate called:
+Created a custom Web Server certificate called `Lab`
 
-```text
-Lab
-```
+Included the Firebox addresses used for administration.
 
-I included the Firebox addresses used for administration.
-
-I exported the certificate and installed it in Windows:
-
-```text
-Trusted Root Certification Authorities
-```
+Exported the certificate and installed it in Windows `Trusted Root Certification Authorities`
 
 This removed the browser warning when accessing the Firebox management interface.
 
-This certificate is not the same certificate used for HTTPS content inspection.
+This certificate is not the same one used for HTTPS content inspection.
 
 ### Fireware HTTPS Proxy CA
 
-HTTPS inspection uses the:
-
-```text
-Fireware HTTPS Proxy
-```
-
-certificate authority.
+HTTPS inspection uses the `Fireware HTTPS Proxy` certificate authority.
 
 When the Firebox decrypts and inspects HTTPS traffic, it generates a replacement certificate for the destination site and signs it with this CA.
 
-Clients therefore need to trust the Fireware HTTPS Proxy CA.
+Clients need to trust the Fireware HTTPS Proxy CA.
 
 The certificate can be obtained from the Firebox Certificate Portal:
 
@@ -259,11 +233,7 @@ The certificate can be obtained from the Firebox Certificate Portal:
 https://10.0.1.1:4126/certportal
 ```
 
-I installed it in Windows:
-
-```text
-Trusted Root Certification Authorities
-```
+I installed it in Windows `Trusted Root Certification Authorities`
 
 Without this CA installed, inspected HTTPS sites generate certificate trust warnings.
 
@@ -292,22 +262,6 @@ testing configuration
 troubleshooting traffic
 ```
 
-One useful lesson was that Fireware CLI syntax does not always behave like Cisco-style CLI.
-
-For example, configuration changes do not always require an `apply` command at the general configuration level.
-
-Another version-specific detail I encountered was static route syntax using:
-
-```text
-distance
-```
-
-rather than:
-
-```text
-metric
-```
-
 ## 9. Packet Capture
 
 Fireware includes `tcpdump`, which was useful for checking whether packets actually reached an interface.
@@ -330,7 +284,7 @@ ICMP echo request from 10.30.30.2
 
 That proved Layer 2 and VLAN tagging were working.
 
-The missing ping response was therefore a firewall policy issue rather than a VLAN or Hyper-V problem.
+The missing ping response was just a firewall policy issue.
 
 After allowing MANAGEMENT to ping the Firebox, the test succeeded.
 
@@ -361,24 +315,13 @@ I scanned the public IP using common ports and specific WatchGuard management po
 
 The Firebox detected the activity as a port scan through Default Threat Protection / Default Packet Handling.
 
-The scanning public IP was temporarily added to:
+My public IP was temporarily put into `Blocked Sites`
 
-```text
-Blocked Sites
-```
-
-After that, Nmap reported ports as:
-
-```text
-filtered
-no-response
-```
-
-because the Firebox was silently dropping the traffic.
+After that, Nmap reported ports as `filtered` or `no-response` because the Firebox was silently dropping the traffic.
 
 TCP 443 remained reachable because it was required by the SSL VPN policy.
 
-This demonstrated the difference between:
+This showed the difference between:
 
 ```text
 a service listening
@@ -390,23 +333,7 @@ automatic threat protection blocking the source
 
 During HTTPS inspection testing, one site failed because an HTTP proxy response header line exceeded the configured limit.
 
-The relevant proxy action was:
-
-```text
-Default-HTTP-Client
-```
-
-I increased the maximum response header line length from:
-
-```text
-4096
-```
-
-to:
-
-```text
-8192
-```
+Increased the maximum response header line length from `4096` to `8192`
 
 After that, the site worked.
 
@@ -436,7 +363,7 @@ Firebox TRANSIT 10.0.2.1
 
 This allowed normal routed communication.
 
-However, VLAN subinterfaces created inside WSL did not successfully pass tagged 802.1Q traffic through the WSL / Hyper-V networking path to the physical Firebox trunk.
+However, VLAN subinterfaces created inside WSL did not pass tagged 802.1Q traffic through the WSL / Hyper-V networking path to the physical Firebox trunk.
 
 Because of this, direct Containerlab attachment to the Firebox VLANs was abandoned.
 
@@ -445,16 +372,3 @@ The Containerlab topology and WSL host setup scripts were removed from the repos
 For future virtual clients and servers directly attached to the Firebox trunk, a small Linux Hyper-V VM with a trunked virtual NIC would be a cleaner design.
 
 Containerlab could then run inside that VM and create separate Linux hosts on the real Firebox VLANs.
-
-## 13. General Lessons
-
-A few important lessons from the lab so far:
-
-- A successful ARP exchange proves much more than a failed ping alone.
-- Custom Firebox zones do not automatically receive Trusted or Optional policy access.
-- Management-plane access should use explicit sources instead of broad aliases such as `Any-Trusted`.
-- VPN users should receive access through explicit policies rather than broad VPN allow rules.
-- HTTPS inspection depends on client trust of the Firebox proxy CA.
-- QUIC can bypass a TCP-based HTTPS proxy path.
-- Firewall troubleshooting should separate Layer 2, routing, policy and application-layer problems.
-- Packet captures are often faster than guessing.
