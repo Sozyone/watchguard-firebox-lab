@@ -26,20 +26,8 @@
 
 `eth2` is named `LAN-TRUNK`.
 
-Tagged VLANs:
-
-```text
-10
-20
-30
-40
-```
-
-Untagged VLAN:
-
-```text
-99
-```
+Tagged VLANs: `10 - 20 - 30 - 40`
+Untagged VLAN: `99`
 
 ## Test Clients
 
@@ -64,7 +52,7 @@ GUEST -> SERVERS                     DENY
 GUEST -> MANAGEMENT                  DENY
 ```
 
-`10.0.1.2` remains an additional recovery/admin host.
+`10.0.1.2` remains an additional recovery/admin host on `eth1`.
 
 # Test Commands
 
@@ -193,12 +181,6 @@ ICMP only:
 
 ```text
 tcpdump -i eth2 icmp
-```
-
-Stop capture:
-
-```text
-Ctrl+C
 ```
 
 # Git
