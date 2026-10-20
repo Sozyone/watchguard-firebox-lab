@@ -12,6 +12,12 @@ sudo ip addr replace 10.255.0.1/30 dev r1-t25
 # Enable routing in WSL
 sudo sysctl -w net.ipv4.ip_forward=1
 
+# DNS for WSL lab network
+sudo sh -c 'printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf'
+
+# Default route through Firebox
+sudo ip route replace default via 10.0.2.1 dev eth0
+
 # Routes to Containerlab networks through r1
 sudo ip route replace 10.10.10.0/24 via 10.255.0.2 dev r1-t25
 sudo ip route replace 10.20.20.0/24 via 10.255.0.2 dev r1-t25
