@@ -123,3 +123,99 @@ After that, Nmap started showing the ports as `filtered` / `no-response`
 because the FB was silently dropping traffic.
 
 I could see that TCP 443 was open because of the needed SSL VPN policy.
+
+## 9. VLAN Segmentation and LAN Trunk
+
+I changed Firebox `eth2` into a VLAN trunk called `LAN-TRUNK`.
+
+The current VLANs are:
+
+- VLAN 10 `CORP` — `10.10.10.0/24` — Trusted
+- VLAN 20 `SERVERS` — `10.20.20.0/24` — Optional
+- VLAN 30 `MANAGEMENT` — `10.30.30.0/24` — Custom
+- VLAN 40 `GUEST` — `10.40.40.0/24` — Custom
+- VLAN 99 `TRANSIT` — `10.0.2.0/24` — Trusted
+
+VLANs 10, 20, 30 and 40 are tagged on eth2.
+
+VLAN 99 is untagged on eth2.
+
+### CORP
+
+CORP uses DHCP from the Firebox.
+
+The test client received:
+
+- IP: `10.10.10.100`
+- Gateway: `10.10.10.1`
+- DNS: `1.1.1.1` and `8.8.8.8`
+
+### SERVERS
+
+SERVERS uses static addressing.
+
+The test server interface is:
+
+- IP: `10.20.20.2`
+- Gateway / Firebox interface: `10.20.20.1`
+
+### MANAGEMENT
+
+MANAGEMENT is used for administrative access to the Firebox.
+
+The test management client is:
+
+- IP: `10.30.30.2`
+- Firebox: `10.30.30.1`
+
+I restricted Firebox Web UI and WatchGuard management access so the MANAGEMENT
+VLAN can administer the Firebox, while CORP and GUEST cannot.
+
+I kept `10.0.1.2` on the original management network as a recovery/admin path.
+
+### GUEST
+
+GUEST uses DHCP from the Firebox.
+
+The test client received:
+
+- IP: `10.40.40.100`
+- Gateway: `10.40.40.1`
+
+GUEST is allowed Internet access but has an explicit deny policy to:
+
+- CORP
+- SERVERS
+- MANAGEMENT
+
+Denied traffic is logged.
+
+## 10. Hyper-V VLAN Testing
+
+The Firebox trunk connects to a Hyper-V external switch through the laptop's
+DisplayLink Ethernet adapter.
+
+I created Hyper-V Management OS virtual NICs for the VLANs and configured them
+as access ports:
+
+- CORP → VLAN 10
+- SERVERS → VLAN 20
+- MANAGEMENT → VLAN 30
+- GUEST → VLAN 40
+
+This let me test the VLANs against the physical Firebox without needing multiple
+physical computers.
+
+## 11. Containerlab Attempt
+
+I originally tried to connect Containerlab hosts directly to the Firebox VLANs
+through WSL.
+
+This did not work correctly because the WSL / Hyper-V networking path did not
+pass the tagged 802.1Q traffic the way needed for direct Containerlab VLAN hosts.
+
+The previous Containerlab topology and host setup scripts were therefore removed.
+
+If I later want multiple virtual Linux clients and servers directly connected to
+the Firebox VLANs, I can use a Linux Hyper-V VM with a trunk NIC and run
+Containerlab inside that VM.
