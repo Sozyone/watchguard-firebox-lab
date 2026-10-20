@@ -22,12 +22,10 @@
 | 20 | SERVERS | 10.20.20.0/24 | 10.20.20.1 | Optional |
 | 30 | MANAGEMENT | 10.30.30.0/24 | 10.30.30.1 | Custom |
 | 40 | GUEST | 10.40.40.0/24 | 10.40.40.1 | Custom |
-| 99 | TRANSIT | 10.0.2.0/24 | 10.0.2.1 | Trusted |
 
 `eth2` is named `LAN-TRUNK`.
 
 Tagged VLANs: `10 - 20 - 30 - 40`
-Untagged VLAN: `99`
 
 ## Test Clients
 
@@ -156,7 +154,6 @@ show vlan CORP
 show vlan SERVERS
 show vlan MANAGEMENT
 show vlan GUEST
-show vlan TRANSIT
 ```
 
 Show interface:
