@@ -228,14 +228,10 @@ git push
 
 # Testing Limitation
 
-The current CORP, SERVERS, MANAGEMENT and GUEST test interfaces exist on the same
-Windows host.
+The current CORP, SERVERS, MANAGEMENT and GUEST interfaces are all on the same Windows PC.
 
-Windows can route traffic locally between its own interfaces, so this setup should
-not be used as proof of CORP-to-SERVERS inter-VLAN firewall enforcement.
+Because of that, Windows can sometimes route traffic between them itself instead of sending it through the Firebox.
 
-Testing access to the Firebox itself and testing Internet access from specific
-VLAN source addresses is valid.
+So these interfaces are good for testing VLANs, DHCP, Internet access and Firebox access, but not for proving CORP-to-SERVERS firewall rules.
 
-For true virtual clients and servers on separate VLANs, use separate VMs or physical
-hosts so traffic must traverse the Firebox.
+For real inter-VLAN testing, use separate VMs or physical hosts so the traffic has to pass through the Firebox.
