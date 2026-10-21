@@ -2,12 +2,9 @@
 
 Notes and observations from working with a WatchGuard Firebox T25.
 
-## 1. Initial Setup
+I first, factory resetted, ran the setup wizard, set it as locally managed, and added to WG Cloud. 
 
-Factory reset the T25, ran the setup wizard and set it as locally managed.
-Later the network was redesigned with VLANs.
-
-## 2. VPN
+## 1. VPN
 
 Configured both Mobile VPN with SSL and IKEv2 using Firebox-DB users.
 
@@ -56,7 +53,7 @@ I tested both VPNs externally from the RDATA network.
 
 Both successfully reached the MANAGEMENT network and Firebox Web UI.
 
-## 3. HTTPS Proxy
+## 2. HTTPS Proxy
 
 Tested HTTPS content inspection with `Default-HTTPS-Client`.
 
@@ -87,7 +84,7 @@ Then the network stays faster, Firebox uses way less ressources, don't need to c
 So yeah, most Firebox features are kind of useless for small businesses with low threat levels. Just use strong EPDR and MFA.
 Not everyone should go Palo Alto-level extreme security. Inspect and deny everything is not realistic for most SMEs.  
 
-## 4. QUIC / HTTP3
+## 3. QUIC / HTTP3
 
 HTTPS proxy inspection primarily applies to HTTPS over TCP, but browsers can also use QUIC / HTTP3 over `UDP 443`
 
@@ -97,7 +94,7 @@ I tested blocking UDP 443, which forced browsers back to TCP 443 so HTTPS inspec
 
 I removed this afterward because I am not using TLS inspection in the final design.
 
-## 5. Certificates
+## 4. Certificates
 
 There are two different certificate purposes.
 
@@ -121,7 +118,7 @@ Certificate Portal:
 https://<firebox-ip>:4126/certportal
 ```
 
-## 6. Troubleshooting Observations
+## 5. Troubleshooting Observations
 
 ### MANAGEMENT VLAN
 
@@ -166,7 +163,7 @@ Changed:
 
 and the site worked.
 
-## 7. WSL / Containerlab
+## 6. WSL / Containerlab
 
 Tried using WSL and Containerlab to create virtual clients and servers directly on the Firebox VLANs.
 
