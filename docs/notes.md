@@ -5,19 +5,11 @@ Notes and observations from working with a WatchGuard Firebox T25.
 ## 1. Initial Setup
 
 Factory reset the T25, ran the setup wizard and set it as locally managed.
-
-Initial setup used:
-
-```text
-eth0 - External - DHCP
-eth1 - Trusted  - 10.0.1.1/24
-```
-
-Later the network was redesigned with VLANs. Most config is done through WSM / Policy Manager.
+Later the network was redesigned with VLANs.
 
 ## 2. VPN
 
-Configured both Mobile VPN with SSL and IKEv2 using Firebox-DB.
+Configured both Mobile VPN with SSL and IKEv2 using Firebox-DB users.
 
 Pools:
 
@@ -26,11 +18,11 @@ SSL VPN   192.168.132.0/24
 IKEv2     192.168.122.0/24
 ```
 
-I disabled the broad default VPN policies and instead added VPN users only to policies they need.
+Disabled the broad default VPN policies. Instead added VPN users to policies they need.
 
 ### SSL VPN
 
-Uses:
+Configured:
 
 ```text
 TCP 443 - authentication/control
@@ -47,10 +39,6 @@ The VPN client should be kept updated, especially when WatchGuard PSIRT says so 
 
 ### IKEv2
 
-IKE starts on UDP 500.
-
-If NAT is detected it switches to UDP 4500 using NAT-T.
-
 Configured:
 
 ```text
@@ -62,7 +50,7 @@ ESP-AES256-GCM
 PFS
 DH-20
 ```
-Installed the generated IKEv2 client profile on Windows using the WatchGuard-generated `.bat` installer.
+Installed the generated IKEv2 client profile on Windows using the `.bat` installer.
 
 I tested both VPNs externally from the RDATA network.
 
@@ -72,11 +60,7 @@ Both successfully reached the MANAGEMENT network and Firebox Web UI.
 
 Tested HTTPS content inspection with `Default-HTTPS-Client`.
 
-When inspection was enabled, inspected sites were re-signed by:
-
-```text
-Fireware HTTPS Proxy
-```
+When inspection was enabled, inspected sites were re-signed by `Fireware HTTPS Proxy`
 
 Tested from Linux with:
 
@@ -86,26 +70,28 @@ openssl s_client -connect example.com:443 -servername example.com
 
 Some sites were excluded by WatchGuard's predefined Content Inspection Exclusions.
 
-I later decided not to use TLS inspection for the normal small-business design.
+I later decided not to use TLS inspection for my small-business design, but still use proxy policies.
 
-The plan is instead to rely more on:
+Inspection has too many downsides, the plan is instead to rely more on:
 
 ```text
-strong endpoint security / EDR
+Endpoint security / EPDR
 MFA
-segmentation
-Firebox network controls
+Basic Firebox functions
 ```
 
-while still using the HTTP/HTTPS proxy policies.
+No inspection means Firebox AV/IAV/IPS/APT-Blocker/App Control don't work well at all, but EPDR can do a very similar job.
+
+Then the network stays faster, Firebox uses way less ressources, don't need to care about the QUIC/HTTP3 proxy/inspect bypass.
+
+So yeah, most Firebox features are kind of useless for small businesses with low threat levels. Just use strong EPDR and MFA.
+Not everyone should go Palo Alto-level extreme security. Inspect and deny everything is not realistic for most SMEs.  
 
 ## 4. QUIC / HTTP3
 
-HTTPS proxy inspection primarily applies to HTTPS over TCP.
+HTTPS proxy inspection primarily applies to HTTPS over TCP, but browsers can also use QUIC / HTTP3 over `UDP 443`
 
-Modern browsers can use QUIC / HTTP3 over `UDP 443`
-
-That traffic does not pass through the normal HTTPS TCP proxy in the same way.
+That traffic does not pass through the HTTPS TCP proxy in the same way.
 
 I tested blocking UDP 443, which forced browsers back to TCP 443 so HTTPS inspection worked.
 
