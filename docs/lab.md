@@ -11,24 +11,54 @@
              10.255.255.1/29            |
                       |           Hyper-V vSwitch
                 Admin laptop             |
-                10.255.255.2      Windows VLAN test
-                                interfaces / future VMs
+                10.255.255.2      Windows VLAN vNICs
 ```
 
 ## Networks
 
-| VLAN | Name | Network | Firebox | Zone |
-|---|---|---|---|---|
-| 10 | CORP | 10.10.10.0/24 | 10.10.10.1 | Trusted |
-| 20 | SERVERS | 10.20.20.0/24 | 10.20.20.1 | Optional |
-| 30 | MANAGEMENT | 10.30.30.0/24 | 10.30.30.1 | Custom |
-| 40 | GUEST | 10.40.40.0/24 | 10.40.40.1 | Custom |
+| VLAN | Name | Network | Firebox | Zone | Test endpoint |
+|---|---|---|---|---|---|
+| 10 | CORP | 10.10.10.0/24 | 10.10.10.1 | Trusted | 10.10.10.100 DHCP |
+| 20 | SERVERS | 10.20.20.0/24 | 10.20.20.1 | Optional | 10.20.20.2 Static |
+| 30 | MANAGEMENT | 10.30.30.0/24 | 10.30.30.1 | Custom | 10.30.30.2 Static |
+| 40 | GUEST | 10.40.40.0/24 | 10.40.40.1 | Custom | 10.40.40.100 DHCP |
 
-Tagged VLANs: `10 - 20 - 30 - 40`
+Firebox `eth2` is the trunk carrying tagged VLANs `10, 20, 30, 40`.
 
-## Recovery Network
+## Hyper-V vSwitch
 
-Firebox `eth1` is a  recovery interface so  a backup path to the Firebox if MANAGEMENT is unavailable.
+My PC's 2nd Ethernet NIC is connected to Firebox `eth2`.
+
+Hyper-V has an External vSwitch called `Firebox-Lab` using that NIC.
+
+I made one virtual NIC for each VLAN:
+
+```text
+vEthernet (CORP)        VLAN 10
+vEthernet (SERVERS)     VLAN 20
+vEthernet (MANAGEMENT)  VLAN 30
+vEthernet (GUEST)       VLAN 40
+```
+
+All VLANs travel through the same physical Ethernet NIC.
+
+```text
+Windows
+   |
+vEthernet (CORP)
+   |
+Hyper-V tags it VLAN 10
+   |
+2nd Ethernet NIC
+   |
+Firebox eth2 trunk
+```
+
+The physical NIC is the trunk and Windows sees each VLAN as a separate virtual NIC.
+
+## Recovery
+
+Firebox `eth1` is a separate recovery path if MANAGEMENT or the trunk stops working.
 
 ```text
 Network:      10.255.255.0/29
@@ -38,16 +68,9 @@ Zone:         Custom
 DHCP:         Enabled
 ```
 
-DHCP shouldn't be enabled and network should be /30, but for my lab I need DHCP for other reasons. 
+For a dedicated recovery link I would normally use static addresses and a `/30`.
 
-## Test Clients
-
-```text
-CORP        10.10.10.100   DHCP
-SERVERS     10.20.20.2     Static
-MANAGEMENT  10.30.30.2     Static
-GUEST       10.40.40.100   DHCP
-```
+For this lab I use DHCP and `/29` so the laptop can still switch between the Firebox and other networks.
 
 ## Current Security Design
 
