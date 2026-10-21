@@ -131,7 +131,7 @@ ping -S 10.30.30.2 10.30.30.1
 Should work:
 
 ```powershell
-curl.exe -k --interface 10.30.30.2 https://10.30.30.1:8080
+
 ```
 
 ## Test SSH from MANAGEMENT
@@ -168,6 +168,37 @@ ping -S 10.40.40.100 1.1.1.1
 
 ```powershell
 curl.exe --interface 10.40.40.100 https://example.com
+```
+## Lab Scripts
+
+### Show lab status
+
+Shows the VLAN interfaces and their IPv4 addresses.
+
+From Ubuntu/WSL:
+
+```bash
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w "$PWD/scripts/Show-LabStatus.ps1")"
+```
+
+From Windows PowerShell:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "\\wsl.localhost\Ubuntu\home\michael\projects\watchguard-firebox-lab\scripts\Show-LabStatus.ps1"
+```
+
+### Test lab
+
+From Ubuntu/WSL:
+
+```bash
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w "$PWD/scripts/Test-Lab.ps1")"
+```
+
+From Windows PowerShell:
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "\\wsl.localhost\Ubuntu\home\michael\projects\watchguard-firebox-lab\scripts\Test-Lab.ps1"
 ```
 
 # Firebox CLI
