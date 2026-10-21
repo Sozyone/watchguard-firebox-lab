@@ -189,9 +189,6 @@ Show VLANs:
 ```text
 show vlan
 show vlan CORP
-show vlan SERVERS
-show vlan MANAGEMENT
-show vlan GUEST
 ```
 
 Show interface:
@@ -227,31 +224,6 @@ git status
 git add .
 git commit -m "Update"
 git push
-```
-
-Check changes:
-
-```bash
-git diff
-git diff --cached
-```
-
-Recent commits:
-
-```bash
-git log --oneline -10
-```
-
-Restore an unstaged file:
-
-```bash
-git restore filename
-```
-
-Unstage a file:
-
-```bash
-git restore --staged filename
 ```
 
 # Testing Limitation
