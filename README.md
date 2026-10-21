@@ -1,22 +1,23 @@
 # WatchGuard Firebox Lab
 
-Hands-on lab built around a physical WatchGuard Firebox T25.
+Lab using a physical WatchGuard Firebox T25.
 
-The lab covers:
+Covers:
 
-- VLAN segmentation
-- Firewall policies
+- VLANs
+- Firewall rules
 - DHCP
-- Management isolation
-- Guest isolation
+- Management and guest isolation
 - HTTPS inspection
 - SSL VPN
 - IKEv2
 - Certificates
 - Fireware CLI
+- Routing
 - Troubleshooting
+- PowerShell testing
 
 ## Documentation
 
-- [Lab architecture and test commands](docs/lab.md)
-- [Firebox configuration notes and observations](docs/notes.md)
+- [Lab setup and tests](docs/lab.md)
+- [Notes](docs/notes.md)
