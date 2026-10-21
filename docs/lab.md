@@ -3,15 +3,16 @@
 ## Topology
 
 ```text
-                         Internet
-                            |
+                          Internet
+                             |
                         Firebox T25
-                            |
-                    eth2 - LAN-TRUNK
-                            |
-                     Hyper-V vSwitch
-                            |
-              Windows VLAN test interfaces
+                      /             \
+             eth1 - RECOVERY     eth2 - LAN-TRUNK
+             10.255.255.1/29            |
+                      |           Hyper-V vSwitch
+                Admin laptop             |
+                10.255.255.2      Windows VLAN test
+                                interfaces / future VMs
 ```
 
 ## Networks
@@ -23,9 +24,21 @@
 | 30 | MANAGEMENT | 10.30.30.0/24 | 10.30.30.1 | Custom |
 | 40 | GUEST | 10.40.40.0/24 | 10.40.40.1 | Custom |
 
-`eth2` is named `LAN-TRUNK`.
-
 Tagged VLANs: `10 - 20 - 30 - 40`
+
+## Recovery Network
+
+Firebox `eth1` is a  recovery interface so  a backup path to the Firebox if MANAGEMENT is unavailable.
+
+```text
+Network:      10.255.255.0/29
+Firebox:      10.255.255.1
+Admin laptop: 10.255.255.2
+Zone:         Custom
+DHCP:         Enabled
+```
+
+DHCP shouldn't be enabled and network should be /30, but for my lab I need DHCP for other reasons. 
 
 ## Test Clients
 
@@ -40,17 +53,19 @@ GUEST       10.40.40.100   DHCP
 
 ```text
 MANAGEMENT -> Firebox management     ALLOW
+RECOVERY   -> Firebox management     ALLOW
 CORP       -> Firebox management     DENY
 SERVERS    -> Firebox management     DENY
 GUEST      -> Firebox management     DENY
 
-GUEST -> Internet                    ALLOW
-GUEST -> CORP                        DENY
-GUEST -> SERVERS                     DENY
-GUEST -> MANAGEMENT                  DENY
-```
+CORP       -> Internet               ALLOW
+MANAGEMENT -> Internet               ALLOW
+GUEST      -> Internet               ALLOW
 
-`10.0.1.2` remains an additional recovery/admin host on `eth1`.
+GUEST      -> CORP                   DENY
+GUEST      -> SERVERS                DENY
+GUEST      -> MANAGEMENT             DENY
+```
 
 # Test Commands
 
@@ -137,7 +152,7 @@ curl.exe --interface 10.40.40.100 https://example.com
 Connect:
 
 ```powershell
-ssh -p 4118 admin@10.0.1.1
+ssh -p 4118 admin@10.255.255.1
 ```
 
 Or through MANAGEMENT:
@@ -187,7 +202,7 @@ Normal workflow:
 ```bash
 git status
 git add .
-git commit -m "Describe what changed"
+git commit -m "Update"
 git push
 ```
 
