@@ -103,7 +103,8 @@ There are two different certificate purposes.
 
 Used for the Firebox management interface.
 
-I created a custom certificate called `Lab` and trusted it in Windows.
+I created a custom certificate called `Lab` from Policy Manage. Then exported it to my PC from System Manager.
+Then renamed the .pem to .cer, installed it to `Trusted Root Certification Authorities` on local machine.
 
 This removed the browser warning when accessing the Firebox management interface.
 
