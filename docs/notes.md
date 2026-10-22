@@ -26,7 +26,8 @@ TCP 443 - authentication/control
 UDP 443 - data channel
 ```
 
-UDP avoids TCP-over-TCP and performs better.
+UDP avoids TCP-over-TCP and performs better. If the VPN gets blocked somewhere, switch data channel to TCP.
+If it still gets blocked, switch it to UDP 53.
 
 Encryption uses AES-GCM 256-bit.
 
