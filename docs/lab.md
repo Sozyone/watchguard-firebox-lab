@@ -8,7 +8,7 @@
                         Firebox T25
                       /             \
              eth1 - RECOVERY     eth2 - LAN-TRUNK
-             10.255.255.1/29            |
+             10.255.255.1/30            |
                       |           Hyper-V vSwitch
                 Admin laptop             |
                 10.255.255.2      Windows VLAN vNICs
