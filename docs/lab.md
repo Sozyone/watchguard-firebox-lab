@@ -68,7 +68,7 @@ Zone:         Custom
 DHCP:         Enabled
 ```
 
-For real recovery, I would  use static addresses, but for this lab I need DHCP for unrelated reasons.
+I use DHCP vs static for convinience and the only IP of the subnet is reserved to my laptop anyway.
 
 ## Current Security Design
 
