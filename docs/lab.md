@@ -131,7 +131,7 @@ ping -S 10.30.30.2 10.30.30.1
 Should work:
 
 ```powershell
-
+curl.exe -k --interface 10.30.30.2 https://10.30.30.1:8080
 ```
 
 ## Test SSH from MANAGEMENT
