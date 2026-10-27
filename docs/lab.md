@@ -61,16 +61,15 @@ The physical NIC is the trunk and Windows sees each VLAN as a separate virtual N
 Firebox `eth1` is a separate recovery path if MANAGEMENT or the trunk stops working.
 
 ```text
-Network:      10.255.255.0/29
+Network:      10.255.255.0/30
 Firebox:      10.255.255.1
 Admin laptop: 10.255.255.2
 Zone:         Custom
 DHCP:         Enabled
 ```
 
-For a dedicated recovery link I would normally use static addresses and a `/30`.
-
-For this lab I use DHCP and `/29` so the laptop can still switch between the Firebox and other networks.
+For a dedicated recovery link I would normally use static addresses,
+but for this lab I use DHCP so the laptop can still switch between the Firebox and other networks.
 
 ## Current Security Design
 
