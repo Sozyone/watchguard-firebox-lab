@@ -68,8 +68,7 @@ Zone:         Custom
 DHCP:         Enabled
 ```
 
-For a dedicated recovery link I would normally use static addresses,
-but for this lab I use DHCP so the laptop can still switch between the Firebox and other networks.
+For real recovery, I would  use static addresses, but for this lab I need DHCP for unrelated reasons.
 
 ## Current Security Design
 
